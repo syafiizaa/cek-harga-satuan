@@ -1,0 +1,1279 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kalkulator Harga Satuan</title>
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 170 170' fill='%23ffffff'%3E%3Cpath d='M150.37 130.25c-2.45 5.66-5.35 10.87-8.71 15.66-4.58 6.53-8.33 11.05-11.22 13.56-4.48 4.12-9.28 6.23-14.42 6.35-3.69 0-8.14-1.05-13.32-3.18-5.2-2.12-9.97-3.17-14.34-3.17-4.58 0-9.49 1.05-14.75 3.17-5.26 2.13-9.52 3.24-12.68 3.35-4.93.21-9.84-1.96-14.75-6.52-3.13-2.73-7.04-7.41-11.75-14.04-5.03-7.08-9.17-15.29-12.41-24.65-3.47-10.46-5.21-20.59-5.21-30.42 0-11.25 2.43-20.94 7.28-29.07 3.82-6.52 8.9-11.67 15.25-15.45 6.35-3.78 13.2-5.7 20.56-5.82 3.91 0 9.05 1.21 15.43 3.59 6.36 2.39 10.45 3.6 12.26 3.6 1.36 0 5.96-1.42 13.75-4.24 7.36-2.62 13.56-3.71 18.62-3.29 13.77 1.11 24.1 6.54 31 16.33-12.31 7.47-18.39 17.93-18.25 31.36.13 10.46 3.91 19.17 11.33 26.1 3.37 3.19 7.13 5.66 11.31 7.41-.91 2.63-1.87 5.15-2.88 7.57zM119.11 7.24c0 8.2-2.99 15.86-8.96 22.96-7.2 8.42-15.89 13.29-25.33 12.53-.12-.97-.19-1.99-.19-3.07 0-7.87 3.43-16.3 9.51-23.19 3.03-3.5 6.89-6.4 11.58-8.72 4.68-2.28 9.11-3.54 13.29-3.75.12 1.08.1 2.16.1 3.24z'/%3E%3C/svg%3E">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            overflow-x: hidden;
+            overflow-y: auto;
+            background: #0a0a1a;
+        }
+
+        /* Animated Background */
+        .bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+            overflow: hidden;
+        }
+
+        .bg::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: 
+                radial-gradient(ellipse at 20% 50%, rgba(120, 50, 255, 0.15) 0%, transparent 50%),
+                radial-gradient(ellipse at 80% 20%, rgba(255, 50, 120, 0.1) 0%, transparent 50%),
+                radial-gradient(ellipse at 50% 80%, rgba(50, 120, 255, 0.1) 0%, transparent 50%);
+        }
+
+        .orb {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(80px);
+            animation: float 8s ease-in-out infinite;
+        }
+
+        .orb-1 {
+            width: 400px;
+            height: 400px;
+            background: rgba(124, 58, 237, 0.25);
+            top: -100px;
+            right: -100px;
+            animation-delay: 0s;
+            animation-duration: 10s;
+        }
+
+        .orb-2 {
+            width: 350px;
+            height: 350px;
+            background: rgba(236, 72, 153, 0.2);
+            bottom: -80px;
+            left: -80px;
+            animation-delay: -3s;
+            animation-duration: 12s;
+        }
+
+        .orb-3 {
+            width: 250px;
+            height: 250px;
+            background: rgba(59, 130, 246, 0.2);
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            animation-delay: -5s;
+            animation-duration: 9s;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translate(0, 0) scale(1); }
+            25% { transform: translate(30px, -30px) scale(1.05); }
+            50% { transform: translate(-20px, 20px) scale(0.95); }
+            75% { transform: translate(15px, 15px) scale(1.02); }
+        }
+
+        /* Grid pattern overlay */
+        .grid-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+            background-image: 
+                linear-gradient(rgba(255, 255, 255, 0.02) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
+            background-size: 60px 60px;
+            pointer-events: none;
+        }
+
+        /* Main Container */
+        .container {
+            position: relative;
+            z-index: 1;
+            width: 100%;
+            max-width: 440px;
+        }
+
+        .card {
+            background: rgba(255, 255, 255, 0.04);
+            backdrop-filter: blur(40px);
+            -webkit-backdrop-filter: blur(40px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 28px;
+            padding: 44px 36px;
+            box-shadow: 
+                0 30px 60px rgba(0, 0, 0, 0.4),
+                0 0 0 1px rgba(255, 255, 255, 0.05) inset,
+                0 1px 0 rgba(255, 255, 255, 0.1) inset;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-2px);
+            box-shadow: 
+                0 35px 70px rgba(0, 0, 0, 0.45),
+                0 0 0 1px rgba(255, 255, 255, 0.06) inset,
+                0 1px 0 rgba(255, 255, 255, 0.12) inset;
+        }
+
+        /* Header */
+        .header {
+            text-align: center;
+            margin-bottom: 36px;
+        }
+
+        .header-icon {
+            width: 64px;
+            height: 64px;
+            margin: 0 auto 16px;
+            background: linear-gradient(135deg, #7c3aed, #ec4899);
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 10px 30px rgba(124, 58, 237, 0.3);
+            animation: pulse-glow 3s ease-in-out infinite;
+        }
+
+        @keyframes pulse-glow {
+            0%, 100% { box-shadow: 0 10px 30px rgba(124, 58, 237, 0.3); }
+            50% { box-shadow: 0 10px 40px rgba(124, 58, 237, 0.5), 0 0 20px rgba(236, 72, 153, 0.2); }
+        }
+
+        .header-icon svg {
+            width: 30px;
+            height: 30px;
+            fill: none;
+            stroke: white;
+            stroke-width: 2;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+        }
+
+        .header h1 {
+            color: #ffffff;
+            font-size: 24px;
+            font-weight: 800;
+            letter-spacing: -0.5px;
+            background: linear-gradient(135deg, #ffffff, rgba(255, 255, 255, 0.7));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .header p {
+            color: rgba(255, 255, 255, 0.4);
+            font-size: 13px;
+            margin-top: 6px;
+            font-weight: 400;
+        }
+
+        /* Form */
+        .form-group {
+            margin-bottom: 22px;
+            position: relative;
+        }
+
+        .form-group label {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            color: rgba(255, 255, 255, 0.55);
+            font-size: 11.5px;
+            font-weight: 600;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+            letter-spacing: 1.2px;
+        }
+
+        .label-icon {
+            width: 16px;
+            height: 16px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .label-icon svg {
+            width: 14px;
+            height: 14px;
+            stroke: rgba(255, 255, 255, 0.4);
+            fill: none;
+            stroke-width: 2;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+        }
+
+        .input-wrapper {
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+
+        .input-tag {
+            position: absolute;
+            left: 14px;
+            background: rgba(255, 255, 255, 0.07);
+            color: rgba(255, 255, 255, 0.4);
+            font-size: 12px;
+            font-weight: 700;
+            padding: 4px 8px;
+            border-radius: 6px;
+            pointer-events: none;
+            z-index: 2;
+            letter-spacing: 0.5px;
+            transition: all 0.3s ease;
+        }
+
+        .input-tag-right {
+            left: auto;
+            right: 14px;
+        }
+
+        input[type="text"] {
+            width: 100%;
+            padding: 16px 16px 16px 58px;
+            background: rgba(255, 255, 255, 0.04);
+            border: 1.5px solid rgba(255, 255, 255, 0.08);
+            border-radius: 14px;
+            color: #ffffff;
+            font-family: 'Inter', sans-serif;
+            font-size: 20px;
+            font-weight: 700;
+            outline: none;
+            transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+            letter-spacing: 0.5px;
+        }
+
+        input[type="text"].input-right-tag {
+            padding-left: 18px;
+            padding-right: 58px;
+        }
+
+        input[type="text"]:hover {
+            border-color: rgba(255, 255, 255, 0.15);
+            background: rgba(255, 255, 255, 0.06);
+        }
+
+        input[type="text"]:focus {
+            border-color: rgba(124, 58, 237, 0.6);
+            background: rgba(124, 58, 237, 0.06);
+            box-shadow: 
+                0 0 0 4px rgba(124, 58, 237, 0.1),
+                0 4px 20px rgba(124, 58, 237, 0.1);
+        }
+
+        input[type="text"]:focus ~ .input-tag {
+            background: rgba(124, 58, 237, 0.2);
+            color: rgba(200, 170, 255, 0.8);
+        }
+
+        input[type="text"]::placeholder {
+            color: rgba(255, 255, 255, 0.15);
+            font-weight: 500;
+        }
+
+        /* Buttons */
+        .btn-group {
+            display: flex;
+            gap: 12px;
+            margin-top: 30px;
+        }
+
+        .btn {
+            flex: 1;
+            padding: 16px 20px;
+            border: none;
+            border-radius: 14px;
+            font-family: 'Inter', sans-serif;
+            font-size: 14px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            background: rgba(255, 255, 255, 0.15);
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            transition: width 0.5s ease, height 0.5s ease;
+        }
+
+        .btn:active::after {
+            width: 300px;
+            height: 300px;
+        }
+
+        .btn-calculate {
+            background: linear-gradient(135deg, #7c3aed, #a855f7, #ec4899);
+            background-size: 200% 200%;
+            color: #ffffff;
+            flex: 2;
+            box-shadow: 0 8px 30px rgba(124, 58, 237, 0.3);
+            animation: gradient-shift 4s ease infinite;
+        }
+
+        @keyframes gradient-shift {
+            0%, 100% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+        }
+
+        .btn-calculate:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 40px rgba(124, 58, 237, 0.45);
+        }
+
+        .btn-calculate:active {
+            transform: translateY(-1px);
+        }
+
+        .btn-reset {
+            background: rgba(255, 255, 255, 0.05);
+            color: rgba(255, 255, 255, 0.5);
+            border: 1.5px solid rgba(255, 255, 255, 0.08);
+        }
+
+        .btn-reset:hover {
+            background: rgba(239, 68, 68, 0.1);
+            color: #f87171;
+            border-color: rgba(239, 68, 68, 0.25);
+            transform: translateY(-2px);
+        }
+
+        /* Error */
+        .error-msg {
+            display: none;
+            align-items: center;
+            gap: 8px;
+            color: #f87171;
+            font-size: 12.5px;
+            font-weight: 500;
+            margin-top: 4px;
+            padding: 10px 14px;
+            background: rgba(239, 68, 68, 0.08);
+            border: 1px solid rgba(239, 68, 68, 0.15);
+            border-radius: 10px;
+        }
+
+        .error-msg.show {
+            display: flex;
+            animation: shake 0.4s ease, fadeIn 0.3s ease;
+        }
+
+        .error-msg svg {
+            width: 16px;
+            height: 16px;
+            stroke: #f87171;
+            fill: none;
+            stroke-width: 2;
+            flex-shrink: 0;
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            20% { transform: translateX(-6px); }
+            40% { transform: translateX(6px); }
+            60% { transform: translateX(-4px); }
+            80% { transform: translateX(4px); }
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-8px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Result Section */
+        .result-section {
+            margin-top: 30px;
+            display: none;
+        }
+
+        .result-section.show {
+            display: block;
+            animation: resultReveal 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        @keyframes resultReveal {
+            from {
+                opacity: 0;
+                transform: translateY(24px) scale(0.97);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        .divider {
+            height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(124, 58, 237, 0.3), rgba(236, 72, 153, 0.3), transparent);
+            margin-bottom: 22px;
+        }
+
+        .result-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 9px 4px;
+            border-radius: 8px;
+            transition: background 0.2s ease;
+        }
+
+        .result-row:hover {
+            background: rgba(255, 255, 255, 0.03);
+        }
+
+        .result-row .label {
+            color: rgba(255, 255, 255, 0.4);
+            font-size: 13px;
+            font-weight: 500;
+        }
+
+        .result-row .value {
+            color: rgba(255, 255, 255, 0.85);
+            font-size: 14.5px;
+            font-weight: 700;
+            font-variant-numeric: tabular-nums;
+        }
+
+        .result-row .value.discount {
+            color: #f87171;
+        }
+
+        .result-row .value.net {
+            color: #34d399;
+        }
+
+        /* Main Result Card */
+        .result-main {
+            position: relative;
+            background: linear-gradient(135deg, rgba(124, 58, 237, 0.12), rgba(236, 72, 153, 0.12));
+            border: 1px solid rgba(124, 58, 237, 0.2);
+            border-radius: 20px;
+            padding: 28px 24px;
+            margin-top: 18px;
+            text-align: center;
+            overflow: hidden;
+        }
+
+        .result-main::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: conic-gradient(
+                from 0deg,
+                transparent,
+                rgba(124, 58, 237, 0.08),
+                transparent,
+                rgba(236, 72, 153, 0.08),
+                transparent
+            );
+            animation: rotate-bg 8s linear infinite;
+        }
+
+        @keyframes rotate-bg {
+            to { transform: rotate(360deg); }
+        }
+
+        .result-main-content {
+            position: relative;
+            z-index: 1;
+        }
+
+        .result-main .label {
+            color: rgba(255, 255, 255, 0.5);
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 2.5px;
+            margin-bottom: 10px;
+            font-weight: 600;
+        }
+
+        .result-main .price {
+            color: #ffffff;
+            font-size: 38px;
+            font-weight: 900;
+            letter-spacing: -0.5px;
+            line-height: 1;
+        }
+
+        .result-main .price .currency {
+            font-size: 20px;
+            font-weight: 700;
+            color: rgba(255, 255, 255, 0.5);
+            margin-right: 4px;
+            vertical-align: top;
+            line-height: 2;
+        }
+
+        .result-main .per-unit {
+            color: rgba(255, 255, 255, 0.35);
+            font-size: 12px;
+            margin-top: 8px;
+            font-weight: 500;
+        }
+
+        /* Input no tag (nama barang) */
+        input[type="text"].input-no-tag {
+            padding-left: 18px;
+            padding-right: 18px;
+            font-size: 16px;
+            font-weight: 600;
+        }
+
+        .optional-badge {
+            font-size: 9px;
+            font-weight: 500;
+            color: rgba(255, 255, 255, 0.25);
+            background: rgba(255, 255, 255, 0.05);
+            padding: 2px 6px;
+            border-radius: 4px;
+            margin-left: 4px;
+            text-transform: lowercase;
+            letter-spacing: 0.5px;
+        }
+
+        /* Footer */
+        .footer {
+            text-align: center;
+            margin-top: 24px;
+            color: rgba(255, 255, 255, 0.15);
+            font-size: 11px;
+            font-weight: 500;
+            letter-spacing: 0.5px;
+        }
+
+        /* History Section */
+        .history-card {
+            background: rgba(255, 255, 255, 0.04);
+            backdrop-filter: blur(40px);
+            -webkit-backdrop-filter: blur(40px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 28px;
+            padding: 32px 36px;
+            margin-top: 20px;
+            box-shadow: 0 30px 60px rgba(0, 0, 0, 0.4);
+        }
+
+        .history-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .history-header h2 {
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 16px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .history-header h2 svg {
+            width: 18px;
+            height: 18px;
+            stroke: rgba(255, 255, 255, 0.5);
+            fill: none;
+            stroke-width: 2;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+        }
+
+        .history-count {
+            font-size: 11px;
+            font-weight: 600;
+            color: rgba(124, 58, 237, 0.8);
+            background: rgba(124, 58, 237, 0.12);
+            padding: 3px 8px;
+            border-radius: 10px;
+            margin-left: 6px;
+        }
+
+        .btn-clear-history {
+            background: none;
+            border: 1px solid rgba(239, 68, 68, 0.2);
+            color: rgba(239, 68, 68, 0.6);
+            font-family: 'Inter', sans-serif;
+            font-size: 11px;
+            font-weight: 600;
+            padding: 6px 12px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .btn-clear-history:hover {
+            background: rgba(239, 68, 68, 0.1);
+            color: #f87171;
+            border-color: rgba(239, 68, 68, 0.35);
+        }
+
+        .btn-clear-history svg {
+            width: 13px;
+            height: 13px;
+            stroke: currentColor;
+            fill: none;
+            stroke-width: 2;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+        }
+
+        .history-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .history-item {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            border-radius: 14px;
+            padding: 16px;
+            transition: all 0.3s ease;
+            position: relative;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .history-item:hover {
+            background: rgba(255, 255, 255, 0.05);
+            border-color: rgba(255, 255, 255, 0.1);
+        }
+
+        .history-item-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 10px;
+        }
+
+        .history-item-name {
+            color: #ffffff;
+            font-size: 14px;
+            font-weight: 700;
+            max-width: 70%;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .history-item-name.no-name {
+            color: rgba(255, 255, 255, 0.3);
+            font-style: italic;
+            font-weight: 500;
+        }
+
+        .history-item-delete {
+            background: none;
+            border: none;
+            color: rgba(255, 255, 255, 0.2);
+            cursor: pointer;
+            padding: 4px;
+            border-radius: 6px;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .history-item-delete:hover {
+            color: #f87171;
+            background: rgba(239, 68, 68, 0.1);
+        }
+
+        .history-item-delete svg {
+            width: 14px;
+            height: 14px;
+            stroke: currentColor;
+            fill: none;
+            stroke-width: 2;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+        }
+
+        .history-item-price {
+            color: #a78bfa;
+            font-size: 20px;
+            font-weight: 800;
+            margin-bottom: 8px;
+        }
+
+        .history-item-price .currency {
+            font-size: 12px;
+            font-weight: 600;
+            color: rgba(167, 139, 250, 0.6);
+            margin-right: 2px;
+        }
+
+        .history-item-details {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+        }
+
+        .history-detail-chip {
+            font-size: 10.5px;
+            font-weight: 500;
+            color: rgba(255, 255, 255, 0.4);
+            background: rgba(255, 255, 255, 0.04);
+            padding: 3px 8px;
+            border-radius: 6px;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .history-item-time {
+            font-size: 10px;
+            color: rgba(255, 255, 255, 0.2);
+            margin-top: 10px;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .history-item-time svg {
+            width: 11px;
+            height: 11px;
+            stroke: rgba(255, 255, 255, 0.2);
+            fill: none;
+            stroke-width: 2;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+        }
+
+        .history-empty {
+            text-align: center;
+            padding: 30px 20px;
+            color: rgba(255, 255, 255, 0.2);
+            font-size: 13px;
+        }
+
+        .history-empty svg {
+            width: 40px;
+            height: 40px;
+            stroke: rgba(255, 255, 255, 0.1);
+            fill: none;
+            stroke-width: 1.5;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+            margin-bottom: 10px;
+        }
+
+        /* Responsive */
+        @media (max-width: 480px) {
+            body {
+                padding: 12px;
+                align-items: flex-start;
+                padding-top: 30px;
+            }
+
+            .card {
+                padding: 32px 24px;
+                border-radius: 24px;
+            }
+
+            .history-card {
+                padding: 24px 20px;
+                border-radius: 24px;
+            }
+
+            .header-icon {
+                width: 56px;
+                height: 56px;
+                border-radius: 16px;
+            }
+
+            .header-icon svg {
+                width: 26px;
+                height: 26px;
+            }
+
+            .header h1 {
+                font-size: 20px;
+            }
+
+            input[type="text"] {
+                font-size: 18px;
+                padding: 14px 14px 14px 54px;
+            }
+
+            input[type="text"].input-no-tag {
+                padding: 14px 16px;
+                font-size: 15px;
+            }
+
+            input[type="text"].input-right-tag {
+                padding-left: 16px;
+                padding-right: 54px;
+            }
+
+            .btn {
+                padding: 14px 16px;
+                font-size: 13px;
+            }
+
+            .result-main .price {
+                font-size: 30px;
+            }
+
+            .result-main .price .currency {
+                font-size: 17px;
+            }
+
+            .history-item-price {
+                font-size: 18px;
+            }
+        }
+
+        /* Scrollbar */
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 3px;
+        }
+
+        /* Selection */
+        ::selection {
+            background: rgba(124, 58, 237, 0.4);
+            color: #fff;
+        }
+    </style>
+</head>
+<body>
+    <!-- Animated Background -->
+    <div class="bg">
+        <div class="orb orb-1"></div>
+        <div class="orb orb-2"></div>
+        <div class="orb orb-3"></div>
+    </div>
+    <div class="grid-overlay"></div>
+
+    <!-- Main Card -->
+    <div class="container">
+        <div class="card">
+            <div class="header">
+                <div class="header-icon">
+                    <svg viewBox="0 0 24 24">
+                        <rect x="4" y="2" width="16" height="20" rx="2"/>
+                        <line x1="8" y1="6" x2="16" y2="6"/>
+                        <line x1="8" y1="10" x2="10" y2="10"/>
+                        <line x1="14" y1="10" x2="16" y2="10"/>
+                        <line x1="8" y1="14" x2="10" y2="14"/>
+                        <line x1="14" y1="14" x2="16" y2="14"/>
+                        <line x1="8" y1="18" x2="10" y2="18"/>
+                        <line x1="14" y1="18" x2="16" y2="18"/>
+                    </svg>
+                </div>
+                <h1>Kalkulator Harga Satuan</h1>
+                <p>Hitung harga per pcs setelah diskon</p>
+            </div>
+
+            <!-- Nama Barang (Opsional) -->
+            <div class="form-group">
+                <label>
+                    <span class="label-icon">
+                        <svg viewBox="0 0 24 24"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/></svg>
+                    </span>
+                    Nama Barang
+                    <span class="optional-badge">opsional</span>
+                </label>
+                <div class="input-wrapper">
+                    <input type="text" id="namaBarang" class="input-no-tag" placeholder="Contoh: Baju Kaos Polos" autocomplete="off">
+                </div>
+            </div>
+
+            <!-- Sub Total -->
+            <div class="form-group">
+                <label>
+                    <span class="label-icon">
+                        <svg viewBox="0 0 24 24"><path d="M12 1v22M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+                    </span>
+                    Sub Total
+                </label>
+                <div class="input-wrapper">
+                    <input type="text" id="subtotal" placeholder="0" inputmode="numeric" autocomplete="off">
+                    <span class="input-tag">Rp</span>
+                </div>
+            </div>
+
+            <!-- Diskon -->
+            <div class="form-group">
+                <label>
+                    <span class="label-icon">
+                        <svg viewBox="0 0 24 24"><line x1="19" y1="5" x2="5" y2="19"/><circle cx="6.5" cy="6.5" r="2.5"/><circle cx="17.5" cy="17.5" r="2.5"/></svg>
+                    </span>
+                    Diskon
+                </label>
+                <div class="input-wrapper">
+                    <input type="text" id="diskon" placeholder="0" inputmode="numeric" autocomplete="off">
+                    <span class="input-tag">Rp</span>
+                </div>
+            </div>
+
+            <!-- Jumlah Barang -->
+            <div class="form-group">
+                <label>
+                    <span class="label-icon">
+                        <svg viewBox="0 0 24 24"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>
+                    </span>
+                    Jumlah Barang
+                </label>
+                <div class="input-wrapper">
+                    <input type="text" id="jumlah" class="input-right-tag" placeholder="0" inputmode="numeric" autocomplete="off">
+                    <span class="input-tag input-tag-right">Pcs</span>
+                </div>
+            </div>
+
+            <!-- Error Message -->
+            <div id="errorMsg" class="error-msg">
+                <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+                <span id="errorText"></span>
+            </div>
+
+            <!-- Buttons -->
+            <div class="btn-group">
+                <button class="btn btn-reset" onclick="resetForm()">Reset</button>
+                <button class="btn btn-calculate" onclick="hitung()">Hitung =</button>
+            </div>
+
+            <!-- Results -->
+            <div id="resultSection" class="result-section">
+                <div class="divider"></div>
+
+                <div class="result-row">
+                    <span class="label">Sub Total</span>
+                    <span class="value" id="resSubtotal">-</span>
+                </div>
+                <div class="result-row">
+                    <span class="label">Diskon</span>
+                    <span class="value discount" id="resDiskon">-</span>
+                </div>
+                <div class="result-row">
+                    <span class="label">Harga Bersih</span>
+                    <span class="value net" id="resHargaBersih">-</span>
+                </div>
+                <div class="result-row">
+                    <span class="label">Jumlah Barang</span>
+                    <span class="value" id="resJumlah">-</span>
+                </div>
+
+                <div class="result-main">
+                    <div class="result-main-content">
+                        <div class="label">Harga per Pcs</div>
+                        <div class="price" id="resHargaPcs">
+                            <span class="currency">Rp</span>0
+                        </div>
+                        <div class="per-unit">per satuan setelah diskon</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="footer">
+                &copy; 2025 — Price Calculator
+            </div>
+        </div>
+
+        <!-- History Section -->
+        <div class="history-card" id="historyCard" style="display: none;">
+            <div class="history-header">
+                <h2>
+                    <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                    Riwayat
+                    <span class="history-count" id="historyCount">0</span>
+                </h2>
+                <button class="btn-clear-history" onclick="clearHistory()">
+                    <svg viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+                    Hapus Semua
+                </button>
+            </div>
+            <div class="history-list" id="historyList"></div>
+        </div>
+    </div>
+
+    <script>
+        // Format number to Indonesian Rupiah format
+        function formatRupiah(angka) {
+            if (isNaN(angka) || angka === null || angka === undefined) return '0';
+            const number = Math.round(angka);
+            return number.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+        }
+
+        // Parse formatted string back to number
+        function parseRupiah(str) {
+            if (!str) return 0;
+            const cleaned = str.replace(/\./g, '').replace(/,/g, '');
+            const num = parseInt(cleaned, 10);
+            return isNaN(num) ? 0 : num;
+        }
+
+        // Auto-format input fields as user types
+        function autoFormat(input) {
+            input.addEventListener('input', function () {
+                const cursorPos = this.selectionStart;
+                const oldLength = this.value.length;
+
+                let raw = this.value.replace(/\D/g, '');
+                raw = raw.replace(/^0+/, '');
+
+                if (raw === '') {
+                    this.value = '';
+                    return;
+                }
+
+                const formatted = parseInt(raw, 10).toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+                this.value = formatted;
+
+                const newLength = this.value.length;
+                const diff = newLength - oldLength;
+                const newCursor = cursorPos + diff;
+                this.setSelectionRange(newCursor, newCursor);
+            });
+        }
+
+        // Initialize
+        autoFormat(document.getElementById('subtotal'));
+        autoFormat(document.getElementById('diskon'));
+        autoFormat(document.getElementById('jumlah'));
+
+        // Enter key
+        document.addEventListener('keydown', function (e) {
+            if (e.key === 'Enter') {
+                hitung();
+            }
+        });
+
+        // Error handling
+        function showError(msg) {
+            const el = document.getElementById('errorMsg');
+            document.getElementById('errorText').textContent = msg;
+            el.classList.remove('show');
+            void el.offsetWidth;
+            el.classList.add('show');
+        }
+
+        function hideError() {
+            const el = document.getElementById('errorMsg');
+            document.getElementById('errorText').textContent = '';
+            el.classList.remove('show');
+        }
+
+        // ===== HISTORY (localStorage) =====
+        function getHistory() {
+            try {
+                const data = localStorage.getItem('priceCalcHistory');
+                return data ? JSON.parse(data) : [];
+            } catch (e) {
+                return [];
+            }
+        }
+
+        function saveHistory(history) {
+            localStorage.setItem('priceCalcHistory', JSON.stringify(history));
+        }
+
+        function addToHistory(entry) {
+            const history = getHistory();
+            history.unshift(entry); // newest first
+            saveHistory(history);
+            renderHistory();
+        }
+
+        function deleteHistoryItem(id) {
+            let history = getHistory();
+            history = history.filter(function(item) { return item.id !== id; });
+            saveHistory(history);
+            renderHistory();
+        }
+
+        function clearHistory() {
+            if (!confirm('Hapus semua riwayat perhitungan?')) return;
+            localStorage.removeItem('priceCalcHistory');
+            renderHistory();
+        }
+
+        function formatTime(isoString) {
+            const d = new Date(isoString);
+            const pad = function(n) { return n < 10 ? '0' + n : n; };
+            return pad(d.getDate()) + '/' + pad(d.getMonth() + 1) + '/' + d.getFullYear() + ' ' +
+                   pad(d.getHours()) + ':' + pad(d.getMinutes());
+        }
+
+        function escapeHtml(str) {
+            const div = document.createElement('div');
+            div.textContent = str;
+            return div.innerHTML;
+        }
+
+        function renderHistory() {
+            const history = getHistory();
+            const card = document.getElementById('historyCard');
+            const list = document.getElementById('historyList');
+            const count = document.getElementById('historyCount');
+
+            if (history.length === 0) {
+                card.style.display = 'none';
+                return;
+            }
+
+            card.style.display = 'block';
+            count.textContent = history.length;
+
+            let html = '';
+            history.forEach(function(item) {
+                const nameHtml = item.nama
+                    ? '<span class="history-item-name">' + escapeHtml(item.nama) + '</span>'
+                    : '<span class="history-item-name no-name">Tanpa nama</span>';
+
+                html += '<div class="history-item">' +
+                    '<div class="history-item-header">' +
+                        nameHtml +
+                        '<button class="history-item-delete" onclick="deleteHistoryItem(\'' + item.id + '\')" title="Hapus">' +
+                            '<svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>' +
+                        '</button>' +
+                    '</div>' +
+                    '<div class="history-item-price"><span class="currency">Rp</span>' + formatRupiah(item.hargaPerPcs) + '</div>' +
+                    '<div class="history-item-details">' +
+                        '<span class="history-detail-chip">Sub: Rp ' + formatRupiah(item.subtotal) + '</span>' +
+                        '<span class="history-detail-chip">Diskon: Rp ' + formatRupiah(item.diskon) + '</span>' +
+                        '<span class="history-detail-chip">Qty: ' + item.jumlah + ' pcs</span>' +
+                    '</div>' +
+                    '<div class="history-item-time">' +
+                        '<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>' +
+                        formatTime(item.createdAt) +
+                    '</div>' +
+                '</div>';
+            });
+
+            list.innerHTML = html;
+        }
+
+        // ===== MAIN CALCULATION =====
+        function hitung() {
+            hideError();
+
+            const namaBarang = document.getElementById('namaBarang').value.trim();
+            const subtotal = parseRupiah(document.getElementById('subtotal').value);
+            const diskon = parseRupiah(document.getElementById('diskon').value);
+            const jumlah = parseRupiah(document.getElementById('jumlah').value);
+
+            if (subtotal <= 0) {
+                showError('Sub Total harus lebih dari 0');
+                return;
+            }
+
+            if (diskon < 0) {
+                showError('Diskon tidak boleh negatif');
+                return;
+            }
+
+            if (diskon >= subtotal) {
+                showError('Diskon tidak boleh lebih besar atau sama dengan Sub Total');
+                return;
+            }
+
+            if (jumlah <= 0) {
+                showError('Jumlah Barang harus lebih dari 0');
+                return;
+            }
+
+            const hargaBersih = subtotal - diskon;
+            const hargaPerPcs = hargaBersih / jumlah;
+
+            document.getElementById('resSubtotal').textContent = 'Rp ' + formatRupiah(subtotal);
+            document.getElementById('resDiskon').textContent = '- Rp ' + formatRupiah(diskon);
+            document.getElementById('resHargaBersih').textContent = 'Rp ' + formatRupiah(hargaBersih);
+            document.getElementById('resJumlah').textContent = jumlah + ' Pcs';
+            document.getElementById('resHargaPcs').innerHTML =
+                '<span class="currency">Rp</span>' + formatRupiah(hargaPerPcs);
+
+            // Show result section
+            const resultSection = document.getElementById('resultSection');
+            resultSection.classList.remove('show');
+            void resultSection.offsetWidth;
+            resultSection.classList.add('show');
+
+            // Save to history
+            addToHistory({
+                id: Date.now().toString(36) + Math.random().toString(36).substr(2, 5),
+                nama: namaBarang || '',
+                subtotal: subtotal,
+                diskon: diskon,
+                hargaBersih: hargaBersih,
+                jumlah: jumlah,
+                hargaPerPcs: Math.round(hargaPerPcs),
+                createdAt: new Date().toISOString()
+            });
+
+            // Scroll to result
+            setTimeout(function() {
+                resultSection.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+            }, 100);
+        }
+
+        // Reset form
+        function resetForm() {
+            document.getElementById('namaBarang').value = '';
+            document.getElementById('subtotal').value = '';
+            document.getElementById('diskon').value = '';
+            document.getElementById('jumlah').value = '';
+            document.getElementById('resultSection').classList.remove('show');
+            hideError();
+            document.getElementById('namaBarang').focus();
+        }
+
+        // Load history & focus on first input on load
+        window.addEventListener('load', function () {
+            renderHistory();
+            document.getElementById('namaBarang').focus();
+        });
+    </script>
+</body>
+</html>
